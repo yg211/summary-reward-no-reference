@@ -1,0 +1,5 @@
+original source link: https://worksheets.codalab.org/worksheets/0xbda93e6519134c1ab1893ceaa19c8a5c/
+
+processed_json: the files are downloaded from the above link, in the section right before the 'How well automatic metrics correlate with human judgement?'. 
+
+raw_json: extracted from the data file, which can be found in the 'Code and data' Section in the above page, towards the very beginning.
