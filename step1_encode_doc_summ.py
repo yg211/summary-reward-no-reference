@@ -4,7 +4,6 @@ from nltk import PorterStemmer, word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from tqdm import tqdm
 from scipy.stats import spearmanr, pearsonr, kendalltau
-import pyter
 from collections import Counter
 import matplotlib.pyplot as plt
 import pickle

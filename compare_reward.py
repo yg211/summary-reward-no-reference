@@ -159,7 +159,7 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
 
 
 if __name__ == '__main__':
-    metric = 'meteor'  # "ROUGE-1-F"
+    metric = 'ROUGE-1-F'  # "ROUGE-1-F"
     prompt = 'overall'
     with_ref = True
     stem = False
