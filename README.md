@@ -55,7 +55,7 @@ This project includes the learned evaluation metric and the code for training it
         
         from rewarder import Rewarder
         rewarder = Rewarder(os.path.join('trained_models','pcc0.5284_epoch50_batch32_pairwise_trainPercent0.8_lrate0.0003_linear'))
-        article = 'This is an example article. Article invludes more information than the summary.'
+        article = 'This is an example article. Article includes more information than the summary.'
         summary = 'This is an example summary.'
         score = rewarder(article,summary)
         
