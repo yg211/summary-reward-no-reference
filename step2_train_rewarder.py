@@ -153,8 +153,8 @@ def parse_args():
     ap.add_argument('-e','--epoch_num',type=int,default=50)
     ap.add_argument('-b','--batch_size',type=int,default=32)
     ap.add_argument('-tt','--train_type',type=str,help='pairwise or regression', default='pairwise')
-    ap.add_argument('-tp','--train_percent',type=float,help='how many data used for training', default=.8)
-    ap.add_argument('-dp','--dev_percent',type=float,help='how many data used for dev', default=.0)
+    ap.add_argument('-tp','--train_percent',type=float,help='how many data used for training', default=.64)
+    ap.add_argument('-dp','--dev_percent',type=float,help='how many data used for dev', default=.16)
     ap.add_argument('-lr','--learn_rate',type=float,help='learning rate', default=3e-4)
     ap.add_argument('-mt','--model_type',type=str,help='deep/linear', default='linear')
     ap.add_argument('-dv','--device',type=str,help='cpu/gpu', default='gpu')
@@ -206,7 +206,7 @@ if __name__ == '__main__':
         loss = pair_train_rewarder(all_vec_dic, train_pairs, deep_model, optimiser, batch_size, device)
         print('--> loss', loss)
 
-        results = test_rewarder(all_vec_dic, test, deep_model, device)
+        results = test_rewarder(all_vec_dic, dev, deep_model, device)
         for metric in results:
             print('{}\t{}'.format(metric,np.mean(results[metric])))
         pcc_list.append(np.mean(results['pcc']))
@@ -215,50 +215,19 @@ if __name__ == '__main__':
     idx = np.argmax(pcc_list)
     best_result = pcc_list[idx]
     print('\n======Best results come from epoch no. {}====='.format(idx))
-    model_weight_name = 'pcc{0:.4f}_'.format(pcc_list[idx])
+
+    deep_model.load_state_dict(weights_list[idx])
+    test_results = test_rewarder(all_vec_dic, test, deep_model, device)
+    print('Its performance on the test set is:')
+    for metric in test_results:
+        print('{}\t{}'.format(metric,np.mean(test_results[metric])))
+    model_weight_name = 'pcc{0:.4f}_'.format(np.mean(test_results['pcc']))
     model_weight_name += 'epoch{}_batch{}_{}_trainPercent{}_lrate{}_{}'.format(
         epoch_num, batch_size, train_type, train_percent, learn_rate, model_type
     )
+
     torch.save(weights_list[idx], os.path.join(MODEL_WEIGHT_DIR, model_weight_name))
-    print('best model weight saved to: {}'.format(os.path.join(MODEL_WEIGHT_DIR, model_weight_name)))
-
-    '''
-    print('Results on test set')
-    results = test_rewarder(all_vec_dic, test, deep_model.load_state_dic(weights_list[idx]), device)
-    for metric in results:
-        print('{}\t{}'.format(metric, np.mean(results[metric])))
-    '''
-
-    '''
-
-    for ii in range(epoch_num):
-        print('\n=====EPOCH {}====='.format(ii))
-        if 'reg' in train_type:
-            loss = regTrainRewarder(genre, 'training', train_valid_topics, deep_model, optimiser, batch_size,device)
-        else:
-            assert 'pair' in train_type
-            loss = pairTrainRewarder(genre, 'training', train_valid_topics, deep_model, optimiser, batch_size, device)
-            #loss = pairTrainRewarder(genre, 'test', train_valid_topics, deep_model, optimiser, batch_size, device)
-
-        print('loss: {}'.format(loss))
-        result = testRewarder(genre,'test',test_valid_topics[:3000],deep_model,device)
-        pcc_list.append(np.mean(result['good_bad_F1']))
-        all_results_list.append(result)
-        model_weights_list.append(copy.deepcopy(deep_model.state_dict()))
-
-    idx = np.argmax(pcc_list)
-    best_result = all_results_list[idx]
-    print('\n======Best results in terms of good-bad-F1 come from epoch no. {}====='.format(idx))
-    for metric in best_result:
-        print('{}:\t{}'.format(metric, np.mean(best_result[metric])))
-
-    model_weight_name = '{}_{}_batch{}_{}_trainSize{}_lrate{}_{}'.format(
-        genre, idx, batch_size, train_type, train_size, learn_rate, model_type
-    )
-    torch.save(model_weights_list[idx],os.path.join(MODEL_WEIGHT_DIR,model_weight_name))
-    print('best model weight saved to: {}'.format(os.path.join(MODEL_WEIGHT_DIR,model_weight_name)))
-
-    '''
+    print('\nbest model weight saved to: {}'.format(os.path.join(MODEL_WEIGHT_DIR, model_weight_name)))
 
 
 
