@@ -79,7 +79,7 @@ def build_model(model_type, vec_length, learn_rate=None):
 
 
 class Rewarder():
-    def __init__(self,model_type='linear',weight_path='.',vec_dim=1024,device='gpu'):
+    def __init__(self,weight_path,model_type='linear',vec_dim=1024,device='gpu'):
         self.bert_tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
         self.bert_model = BertModel.from_pretrained('bert-large-uncased')
         self.reward_model = build_model(model_type,vec_dim*2) # times 2 because the input to the model is the concatenation of the doc-vec and the summ-vec
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     summ3 = 'An image showing one of the campaign\'s billboards was issued by the Cabinet Office ahead of their rollout this week.'
     summ4 = 'A man has died and another is in hospital following a stabbing at a Tube station.'
 
-    rewarder = Rewarder(os.path.join('trained_models','pcc0.5284_epoch50_batch32_pairwise_trainPercent0.8_lrate0.0003_linear'))
+    rewarder = Rewarder(os.path.join('trained_models','sample.model'))
     reward1 = rewarder(doc,summ1)
     reward2 = rewarder(doc,summ2)
     reward3 = rewarder(doc,summ3)

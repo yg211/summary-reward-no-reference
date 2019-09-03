@@ -4,7 +4,6 @@ import numpy as np
 import os
 import argparse
 import random
-import sklearn.metrics as skmetric
 import copy
 from tqdm import tqdm
 import pickle
@@ -196,7 +195,7 @@ if __name__ == '__main__':
     print(len(train_pairs), len(dev_pairs), len(test_pairs))
 
     # read bert vectors
-    with open('data/raw_bert_vectors.p','rb') as ff:
+    with open('data/doc_summ_bert_vectors.pkl','rb') as ff:
         all_vec_dic = pickle.load(ff)
 
     pcc_list = []
@@ -222,7 +221,7 @@ if __name__ == '__main__':
     for metric in test_results:
         print('{}\t{}'.format(metric,np.mean(test_results[metric])))
     model_weight_name = 'pcc{0:.4f}_'.format(np.mean(test_results['pcc']))
-    model_weight_name += 'epoch{}_batch{}_{}_trainPercent{}_lrate{}_{}'.format(
+    model_weight_name += 'epoch{}_batch{}_{}_trainPercent{}_lrate{}_{}.model'.format(
         epoch_num, batch_size, train_type, train_percent, learn_rate, model_type
     )
 

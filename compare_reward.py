@@ -7,6 +7,7 @@ from scipy.stats import spearmanr, pearsonr, kendalltau
 from pytorch_transformers import *
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
+import argparse
 
 from scorer.data_helper.json_reader import read_sorted_scores, read_articles, read_processed_scores, read_scores
 from helpers.data_helpers import sent2stokens_wostop, sent2tokens_wostop, sent2stokens, text_normalization
@@ -73,7 +74,7 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
     elif metric.startswith('bert'):
         pass
         if 'human' in metric:
-            rewarder = Rewarder('linear',os.path.join(MODEL_WEIGHT_DIR,'pcc0.5284_epoch50_batch32_pairwise_trainPercent0.8_lrate0.0003_linear'))
+            rewarder = Rewarder(os.path.join(MODEL_WEIGHT_DIR,'sample.model'))
         elif 'sts' in metric:
             bert_model = SentenceTransformer('bert-large-nli-stsb-mean-tokens')
         elif 'nli' in metric:
@@ -157,11 +158,31 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
 
     return ranks_file_path
 
+def parse_args():
+    ap = argparse.ArgumentParser("arguments for summary sampler")
+    ap.add_argument('-m','--metric',type=str,default='bert-human',choices=['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
+                      'ROUGE-SU*-R', 'bleu-1', 'bleu-2', 'bleu-3', 'bleu-4', 'bleu-5', 'meteor',
+                      'infersent', 'bert-raw','bert-sts','bert-nli','bert-human'],help='compare which metric against the human judgements')
+    ap.add_argument('-p','--prompt',type=str,default='overall',help='which human ratings you want to use as ground truth',choices=['overall','grammar'])
+    ap.add_argument('-r','--with_ref',type=int,default=1,help='whether to use references in your metric; 1: yes, 0: no')
+    ap.add_argument('-s','--stem',type=int,help='whether stem the texts before computing the metrics; 1 yes, 0 no')
+    ap.add_argument('-rs','--remove_stop',type=int,help='whether remove stop words in texts before computing the metrics; 1 yes, 0 no')
+    args = ap.parse_args()
+    return args.metric, args.prompt, args.with_ref, args.stem, args.remove_stop
+
 
 if __name__ == '__main__':
-    metric = 'ROUGE-2-F'  # "ROUGE-1-F"
-    prompt = 'overall'
-    with_ref = True
-    stem = False
-    remove_stop = False
+    metric, prompt, with_ref, stem, remove_stop = parse_args()
+    with_ref = bool(with_ref)
+    stem = bool(stem)
+    remove_stop = bool(remove_stop)
+
+    print('\n=====Arguments====')
+    print('metric: '+metric)
+    print('prompt: '+prompt)
+    print('with ref: '+repr(with_ref))
+    print('stem: '+repr(stem))
+    print('remove stopwords: '+repr(remove_stop))
+    print('=====Arguments====\n')
+
     metric_scores_file = evaluate_metric(metric,stem,remove_stop,with_ref,prompt)
