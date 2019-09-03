@@ -50,7 +50,7 @@ This project includes the learned evaluation metric and the code for training it
         >> mv RELEASE-1.5.5 scorer/auto_metrics/rouge
 
 ## Use the Learned Evaluation Function
-* The pretrained model is at trained_models: pcc0.5284_epoch50_batch32_pairwise_trainPercent0.8_lrate0.0003_linear
+* The pretrained model is at *trained_models/sample.model* 
 * An example usage is provided below:
         
         from rewarder import Rewarder
