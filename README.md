@@ -42,27 +42,31 @@ This project includes the learned evaluation metric and the code for training it
 ## Prerequisties
 * Python3 (tested with Python 3.7 on Ubuntu 18.04 LTS)
 * Install all packages in requirement.txt.
-
-        >> pip3 install -r requirements.txt
+```bash
+pip3 install -r requirements.txt
+```
 
 * Download ROUGE package from the [link](https://www.isi.edu/licensed-sw/see/rouge/) and place it in the rouge directory
-
-        >> mv RELEASE-1.5.5 scorer/auto_metrics/rouge
+```bash
+mv RELEASE-1.5.5 scorer/auto_metrics/rouge
+```
 
 ## Use the Learned Evaluation Function
 * The pretrained model is at *trained_models/sample.model* 
 * An example usage is provided below:
-        
-        from rewarder import Rewarder
-        rewarder = Rewarder(os.path.join('trained_models','sample.model'))
-        article = 'This is an example article. Article includes more information than the summary.'
-        summary = 'This is an example summary.'
-        score = rewarder(article,summary)
+```python
+from rewarder import Rewarder
+rewarder = Rewarder(os.path.join('trained_models','sample.model'))
+article = 'This is an example article. Article includes more information than the summary.'
+summary = 'This is an example summary.'
+score = rewarder(article,summary)
+```        
         
 ## Measure the Correlation Between Different Metric Scores and the Human Ratings
 * *compare_reward.py* is the script for computing the correlation between multiple different metrics and the human ratings. Sample usage:
-
-        python compare_reward.py --metric bert-human --with_ref 1
+```bash
+python compare_reward.py --metric bert-human --with_ref 1
+```
 
 * Metrics supported:
     * ROUGE-1/2-R/F 
@@ -99,13 +103,15 @@ The training involves two steps: (i) vectorise the documents and summaries, and
 (ii) train a linear model on top of the vectors to output scores. We minimise the 
 cross-entropy loss during training (see the paper for more details). 
 * *Step 1: vectorise documents and summaries.* The code is provided at step1_encode_doc_summ.py. Sample usage: 
-
-        python step1_encode_doc_summ.py
+```bash
+python step1_encode_doc_summ.py
+```
         
  We use sliding window to encode texts with more than 512 tokens. The generated vectors are saved as a pickle file at *data/doc_summ_bert_vectors.pkl* .
 * *Step 2: training the linear model.* The code is provided at step2_train_rewarder.py. Sample usage:
-
-        python step2_train_rewarder.py --epoch_num 50 --batch_size 32 --train_type pairwise --train_percent 0.64 --dev_percent 0.16 --learn_rate 3e-4 --model_type linear --device gpu
+```bash
+python step2_train_rewarder.py --epoch_num 50 --batch_size 32 --train_type pairwise --train_percent 0.64 --dev_percent 0.16 --learn_rate 3e-4 --model_type linear --device gpu
+```
  
  The trained model will be saved to the directory *trained_models*. An example model is provided at *trained_models/sample.model*
 
