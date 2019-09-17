@@ -95,6 +95,11 @@ python compare_reward.py --metric bert-human --with_ref 1
 | BERT-NLI, w/o ref     | .258 | .313 | .221 |
 | BERT-NLI-STS, w/ ref  | .289 | .321 | .248 |
 | BERT-NLI-STS, w/o ref | .272 | .321 | .232 |
+|-----------------------|------|------|------|
+| BERT-MOVER-WMD1, w/ ref | .325 | .308 | .278 |
+| BERT-MOVER-WMD2, w/ ref | .323 | .306 | .274 |
+| BERT-MOVER-SMD, w/ ref | .331 | .335 | .282 |
+|-----------------------|------|------|------|
 | Our-Learned, w/ ref   | **.583** | **.609** | **.511** |
 | Our-Learned, w/o ref  | **.583** | **.609** | **.511** |
  

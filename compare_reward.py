@@ -43,7 +43,7 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
     ''' metrics that use reference summaries '''
     assert metric in ['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
                       'ROUGE-SU*-R', 'bleu-1', 'bleu-2', 'bleu-3', 'bleu-4', 'bleu-5', 'meteor',
-                      'infersent', 'bert-raw','bert-sts','bert-nli','bert-human']
+                      'infersent', 'bert-raw','bert-sts','bert-nli','bert-human','mover-1', 'mover-2', 'mover-smd']
     stemmed_str = "_stem" if stem else ""
     stop_str = "_removestop" if remove_stop else ""
     if with_ref:
@@ -52,8 +52,8 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
         ranks_file_path = os.path.join('outputs', 'woref_{}{}{}_{}_rank_correlation.csv'.format(metric, stemmed_str, stop_str, prompt))
     print('\n====={}=====\n'.format(ranks_file_path))
 
-    if os.path.isfile(ranks_file_path):
-        return ranks_file_path
+    #if os.path.isfile(ranks_file_path):
+        #return ranks_file_path
 
     ranks_file = open(ranks_file_path, 'w')
     ranks_file.write('article,summ_id,human_score,metric_score\n')
@@ -83,6 +83,10 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
             #raw BERT
             bert_tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
             bert_model = BertModel.from_pretrained('bert-large-uncased')
+    elif metric.startswith('mover'):
+        print('Make sure that your have started the mover server. Find details at https://github.com/AIPHES/emnlp19-moverscore.')
+        from summ_eval.client import EvalClient
+        mover_scorer = EvalClient()
 
     for i, (article_id, scores_list) in tqdm(enumerate(sorted_scores.items())):
         human_ranks = [s['scores'][prompt] for s in scores_list]
@@ -139,6 +143,13 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
             else: #raw BERT encoder
                 if with_ref: auto_metric_ranks = [raw_bert_rewarder(bert_model,bert_tokenizer,ss,ref_summ) for ss in sys_summs]
                 else: auto_metric_ranks = [raw_bert_rewarder(bert_model,bert_tokenizer,ss,article) for ss in sys_summs]
+        elif metric.startswith('mover'):
+            if '1' in metric: mm = 'wmd_1'
+            elif '2' in metric: mm = 'wmd_2'
+            else: mm = 'smd'
+            if with_ref: cases = [ [[ss], [ref_summ], mm] for ss in sys_summs ]
+            else: cases = [ [[ss], [article], mm] for ss in sys_summs ]
+            auto_metric_ranks = mover_scorer.eval(cases)['0']
 
         for sid, amr, hr in zip(summ_ids, auto_metric_ranks, human_ranks):
             ranks_file.write('{},{},{:.2f},{:.4f}\n'.format(article_id, sid, hr, amr))
@@ -160,7 +171,7 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
 
 def parse_args():
     ap = argparse.ArgumentParser("arguments for summary sampler")
-    ap.add_argument('-m','--metric',type=str,default='bert-human',choices=['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
+    ap.add_argument('-m','--metric',type=str,default='mover-smd',choices=['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
                       'ROUGE-SU*-R', 'bleu-1', 'bleu-2', 'bleu-3', 'bleu-4', 'bleu-5', 'meteor',
                       'infersent', 'bert-raw','bert-sts','bert-nli','bert-human'],help='compare which metric against the human judgements')
     ap.add_argument('-p','--prompt',type=str,default='overall',help='which human ratings you want to use as ground truth',choices=['overall','grammar'])
