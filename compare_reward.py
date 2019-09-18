@@ -148,7 +148,7 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
             elif '2' in metric: mm = 'wmd_2'
             else: mm = 'smd'
             if with_ref: cases = [ [[ss], [ref_summ], mm] for ss in sys_summs ]
-            else: cases = [ [[ss], [article], mm] for ss in sys_summs ]
+            else: cases = [ [[ss], sent_tokenize(article), mm] for ss in sys_summs ]
             auto_metric_ranks = mover_scorer.eval(cases)['0']
 
         for sid, amr, hr in zip(summ_ids, auto_metric_ranks, human_ranks):
@@ -171,11 +171,11 @@ def evaluate_metric(metric, stem, remove_stop, with_ref, prompt='overall'):
 
 def parse_args():
     ap = argparse.ArgumentParser("arguments for summary sampler")
-    ap.add_argument('-m','--metric',type=str,default='mover-smd',choices=['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
+    ap.add_argument('-m','--metric',type=str,default='mover-1',choices=['ROUGE-1-F', 'ROUGE-1-R', 'ROUGE-2-F', 'ROUGE-2-R', 'ROUGE-L-F', 'ROUGE-L-R', 'ROUGE-SU*-F',
                       'ROUGE-SU*-R', 'bleu-1', 'bleu-2', 'bleu-3', 'bleu-4', 'bleu-5', 'meteor',
-                      'infersent', 'bert-raw','bert-sts','bert-nli','bert-human'],help='compare which metric against the human judgements')
+                      'infersent', 'bert-raw','bert-sts','bert-nli','bert-human', 'mover-1', 'mover-2', 'mover-smd'],help='compare which metric against the human judgements')
     ap.add_argument('-p','--prompt',type=str,default='overall',help='which human ratings you want to use as ground truth',choices=['overall','grammar'])
-    ap.add_argument('-r','--with_ref',type=int,default=1,help='whether to use references in your metric; 1: yes, 0: no')
+    ap.add_argument('-r','--with_ref',type=int,default=0,help='whether to use references in your metric; 1: yes, 0: no')
     ap.add_argument('-s','--stem',type=int,help='whether stem the texts before computing the metrics; 1 yes, 0 no')
     ap.add_argument('-rs','--remove_stop',type=int,help='whether remove stop words in texts before computing the metrics; 1 yes, 0 no')
     args = ap.parse_args()
