@@ -83,12 +83,13 @@ class Rewarder():
         self.bert_tokenizer = BertTokenizer.from_pretrained('bert-large-uncased')
         self.bert_model = BertModel.from_pretrained('bert-large-uncased')
         self.reward_model = build_model(model_type,vec_dim*2) # times 2 because the input to the model is the concatenation of the doc-vec and the summ-vec
-        self.reward_model.load_state_dict(torch.load(weight_path))
         if 'gpu' in device or 'cuda' in device:
             self.gpu= True
+            self.reward_model.load_state_dict(torch.load(weight_path))
             self.reward_model.to('cuda')
         else:
             self.gpu = False
+            self.reward_model.load_state_dict(torch.load(weight_path, map_location=lambda storage, loc: storage))
 
     def __call__(self, doc, summ):
         doc_vec = list(raw_bert_encoder(self.bert_model,self.bert_tokenizer,[doc],gpu=self.gpu))
@@ -115,7 +116,7 @@ if __name__ == '__main__':
     summ3 = 'An image showing one of the campaign\'s billboards was issued by the Cabinet Office ahead of their rollout this week.'
     summ4 = 'A man has died and another is in hospital following a stabbing at a Tube station.'
 
-    rewarder = Rewarder(os.path.join('trained_models','sample.model'))
+    rewarder = Rewarder(os.path.join('trained_models','sample.model'),device='cpu')
     reward1 = rewarder(doc,summ1)
     reward2 = rewarder(doc,summ2)
     reward3 = rewarder(doc,summ3)
