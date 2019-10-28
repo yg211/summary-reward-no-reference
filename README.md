@@ -1,6 +1,7 @@
 # Better Rewards Yield Better Summaries: Learning to Summarise Without References
 
-This project includes the source code accompanying the following paper:
+This project includes the source code accompanying the following paper
+(https://arxiv.org/abs/1909.01214):
 
 ```
 @InProceedings{boehm_emnlp2019_summary_reward,
