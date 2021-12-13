@@ -17,7 +17,7 @@ idna==2.8
 jmespath==0.9.4
 joblib==0.13.2
 kiwisolver==1.1.0
-lxml==4.4.1
+lxml==4.6.5
 matplotlib==3.0.3
 murmurhash==1.0.2
 networkx==2.2
