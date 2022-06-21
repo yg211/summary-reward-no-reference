@@ -22,7 +22,7 @@ matplotlib==3.0.3
 murmurhash==1.0.2
 networkx==2.2
 nltk>=3.4.5
-numpy==1.17.1
+numpy==1.22.0
 pandas==0.24.2
 pexpect
 Pillow==6.2.0
