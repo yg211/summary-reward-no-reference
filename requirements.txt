@@ -58,7 +58,7 @@ torchtext==0.3.1
 torchvision==0.2.2.post3
 tornado==6.0.3
 tqdm==4.35.0
-ujson==1.35
+ujson==5.4.0
 urllib3==1.25.3
 visdom==0.1.8.8
 wasabi==0.2.2
